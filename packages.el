@@ -48,7 +48,3 @@
 ;; (package! centered-cursor
 ;;   :recipe (:host github :repo "mpontus/centered-cursor.el"))
 
-
-(package! change-case
-  :recipe (:type git :repo "https://gist.github.com/e8a10244aac6308de1323d1f6685658b.git"))
-(package! grip-mode)
