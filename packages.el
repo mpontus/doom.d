@@ -42,8 +42,7 @@
 (package! docker-tramp)
 (package! separedit)
 (package! ob-http)
-(package! copilot
-  :recipe (:host github :repo "mpontus/copilot.el" :files ("*.el" "dist")))
+(package! copilot)
 
 ;; (package! centered-cursor
 ;;   :recipe (:host github :repo "mpontus/centered-cursor.el"))
