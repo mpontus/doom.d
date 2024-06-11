@@ -54,10 +54,16 @@
 
 ;; Nix
 
+(define-minor-mode nix-format-mode
+  "Minor mode to format nix files on save."
+  nil nil nil
+  (if nix-format-mode
+      (add-hook! 'before-save-hook :local #'nix-format-before-save)
+    (remove-hook! 'before-save-hook :local #'nix-format-before-save)))
+
 (use-package! nix-mode
   :config
-  (add-hook! 'nix-mode-hook
-    (add-hook! 'before-save-hook :local #'nix-format-before-save)))
+  (add-hook! 'nix-mode-hook #'nix-format-mode))
 
 (defadvice! nix-format-buffer--capture-error (f &rest rs)
   "Display actual error when nixfmt fails."
@@ -145,13 +151,13 @@
 
 ;; Symex
 
-(use-package! symex
-  :config
-  ;; (add-hook 'emacs-lisp-mode-hook #'symex-mode)
-  (setq! symex-modal-backend 'evil)
-  (map! :map emacs-lisp-mode-map
-        :leader "SPC" #'symex-mode-interface)
-  (symex-initialize))
+;; (use-package! symex
+;;   :config
+;;   ;; (add-hook 'emacs-lisp-mode-hook #'symex-mode)
+;;   (setq! symex-modal-backend 'evil)
+;;   (map! :map emacs-lisp-mode-map
+;;         :leader "SPC" #'symex-mode-interface)
+;;   (symex-initialize))
 
 ;; Consult
 
@@ -159,6 +165,10 @@
   :config
   (map! :leader "," #'consult-buffer
         :leader "." #'consult-locate))
+
+(use-package hydra
+  :config
+  (load-file (expand-file-name "hydra/org-mode.el" doom-user-dir)))
 
 (defhydra hydra-evil-mc (:color pink
                          :hint nil
@@ -238,11 +248,11 @@ Current pattern: %`evil-mc-pattern
 
 ;; Tree sitter
 
-(use-package! tree-sitter
-  :config
-  (require 'tree-sitter-langs)
-  (global-tree-sitter-mode)
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+;; (use-package! tree-sitter
+;;   :config
+;;   (require 'tree-sitter-langs)
+;;   (global-tree-sitter-mode)
+;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
 ;; Configure password cache
 
@@ -338,9 +348,10 @@ Current pattern: %`evil-mc-pattern
 (define-minor-mode recompile-on-save-mode
   "Run `compile-command' when the buffer is saved."
   :lighter " Rec"
-  (if recompile-on-save-mode
-      (add-hook 'after-save-hook #'recompile nil 'local)
-    (remove-hook 'after-save-hook #'recompile  'local)))
+  (if (not recompile-on-save-mode)
+      (remove-hook 'after-save-hook #'recompile  'local)
+    (add-hook 'after-save-hook #'recompile nil 'local)
+    (unless (buffer-modified-p) (recompile))))
 
 (use-package! compile
   :config
@@ -427,6 +438,75 @@ isn't there and triggers an error"
     (setq grip-github-user (car credential)
           grip-github-password (cadr credential))))
 
-;; drea by default, but I want to use it in org-mode
-;; hello world
-;; dream
+(use-package dotenv
+  :after (projectile)
+  :config
+  (defun dotenv-projectile-hook ()
+   "Projectile hook."
+   (dotenv-update-project-env (projectile-project-root)))
+
+  (add-to-list 'projectile-after-switch-project-hook #'dotenv-projectile-hook) )
+
+(use-package! chatgpt
+  :defer t
+  :config
+  (unless (boundp 'python-interpreter)
+    (defvaralias 'python-interpreter 'python-shell-interpreter))
+  (setq chatgpt-repo-path (expand-file-name "straight/repos/ChatGPT.el/" doom-local-dir))
+  (set-popup-rule! (regexp-quote "*ChatGPT*")
+    :side 'bottom :size .5 :ttl nil :quit t :modeline nil)
+  :bind ("C-c q" . chatgpt-query))
+
+(use-package org-roam
+  :ensure t
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory "~/RoamNotes")
+  (org-roam-completion-everywhere t)
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n r" . org-roam-refile)
+         ("C-c n a" . org-roam-alias-add)
+         :map org-mode-map
+         ("C-M-i" . completion-at-point)
+         :map org-roam-dailies-map
+         ("Y" . org-roam-dailies-capture-yesterday)
+         ("T" . org-roam-dailies-capture-tomorrow))
+  :bind-keymap
+  ("C-c n d" . org-roam-dailies-map)
+  :config
+  (require 'org-roam-dailies) ;; Ensure the keymap is available
+  (org-roam-db-autosync-mode)
+  (setq org-roam-preview-function
+        (defun my/org-roam-preview-function ()
+          (let* ((elem (org-element-context))
+           (parent (org-element-property :parent elem)))
+      ;; TODO: alt handling for non-paragraph elements
+      (string-trim-right (buffer-substring-no-properties
+                          (org-element-property :begin parent)
+                          (org-element-property :end parent)))))))
+
+(use-package! websocket
+    :after org-roam)
+
+(use-package! org-roam
+  :config
+  (add-to-list 'display-buffer-alist
+               '("^\\*org-roam"
+                 (display-buffer-in-atom-window)
+                 (actions)
+                 (side . bottom)
+                 ;; (size . 0.8)
+                 ;; (window-width . 40)
+                 ;; (window-height . 0.16)
+                 ;; (slot . 20)
+                 ;; (vslot)
+                 ;; (window-parameters
+                 ;;  (ttl . 0)
+                 ;;  (quit)
+                 ;;  (select . t)
+                 ;;  (modeline)
+                 ;;  (autosave))
+                 )))

@@ -46,3 +46,24 @@
 ;; (package! centered-cursor
 ;;   :recipe (:host github :repo "mpontus/centered-cursor.el"))
 
+
+(package! dotenv
+  :recipe (:host github :repo "pkulev/dotenv.el"))
+(package! change-case
+  :recipe (:type git :repo "https://gist.github.com/e8a10244aac6308de1323d1f6685658b.git"))
+(package! grip-mode)
+(package! telega)
+(package! dockerfile-mode)
+(package! mixed-pitch)
+(package! csv-mode)
+(package! chatgpt
+  :recipe (:host github :repo "joshcho/ChatGPT.el" :files ("dist" "*.el")))
+(package! gptel)
+;; (package! ob-chatgpt)
+(package! evil-nerd-commenter)
+(package! org-roam)
+(package! simple-httpd
+  :recipe (:host github :repo "skeeto/emacs-web-server" :files ("dist" "*.el")
+           :local-repo "simple-httpd"))
+(package! org-roam-ui)
+(package! treemacs)
