@@ -266,14 +266,7 @@ Current pattern: %`evil-mc-pattern
 
 
 ;; Havent got around to it yet
-
-(use-package! exwm-config
-  ;; :config
-  ;; (exwm-config-default)
-  )
-
-;; Same
-
+;;
 (use-package! persp-mode
   :config
   (map! "M-]" #'persp-next "M-[" #'persp-prev))
@@ -431,13 +424,65 @@ isn't there and triggers an error"
 (use-package org-persist)
 
 (use-package! copilot
-  :config (global-copilot-mode)
-  :bind (:map copilot-completion-map
-         ("RET" . #'copilot-accept-completion)
-         ("<tab>" . #'copilot-accept-completion-by-line)
-         ("C-<tab>" . #'copilot-accept-completion-by-word)
-         ("C-n" . #'copilot-next-completion)
-         ("C-p" . #'copilot-previous-completion)))
+  :hook
+  (prog-mode . copilot-mode)
+  (text-mode . copilot-mode)
+  :bind
+  (:map copilot-completion-map
+        ("RET" . #'copilot-accept-completion)
+        ("<tab>" . #'copilot-accept-completion-by-line)
+        ("C-<tab>" . #'copilot-accept-completion-by-word)
+        ("C-n" . #'copilot-next-completion)
+        ("C-p" . #'copilot-previous-completion))
+  :config
+  (add-to-list 'copilot-indentation-alist '(prog-mode 2))
+  (add-to-list 'copilot-indentation-alist '(org-mode 2))
+  (add-to-list 'copilot-indentation-alist '(text-mode 2))
+  (add-to-list 'copilot-indentation-alist '(closure-mode 2))
+  (add-to-list 'copilot-indentation-alist '(emacs-lisp-mode 2)))
+
+(defvar copilot-chat-transcript
+  (locate-user-emacs-file "copilot-chat-transcript.org"))
+
+(defun copilot-chat-save ()
+  (interactive)
+  (let ((shell-maker--file copilot-chat-transcript))
+    (copilot-chat-shell-save-session-transcript))
+  ;; (cl-letf (((symbol-function 'read-file-name)
+  ;;            (lambda (&rest args)
+  ;;              (message "Overriden")
+  ;;              copilot-chat-transcript)))
+  ;;            ;; (prompt &rest args)
+  ;;            ;;                (message "Overriden")
+  ;;            ;;                copilot-chat-transcript))
+  ;;   (copilot-chat-shell-save-session-transcript))
+  )
+
+(defun copilot-chat-restore ()
+  (interactive)
+  (when (file-exists-p copilot-chat-transcript)
+    (cl-letf (((symbol-function 'read-file-name)
+               (lambda (&rest args)
+                 copilot-chat-transcript)))
+      (copilot-chat-shell-restore-session-from-transcript))
+    ;; (copilot-chat-shell-restore-session-from-transcript copilot-chat-transcript)
+    ))
+
+(define-minor-mode copilot-chat-persistent-mode
+  "Persistent copilot chat mode"
+  :global nil
+  (if copilot-chat-persistent-mode
+      (progn (copilot-chat-restore)
+             (add-hook 'post-command-hook #'copilot-chat-save))
+        (remove-hook 'post-command-hook #'copilot-chat-save)))
+
+(use-package copilot-chat
+  :after (request org markdown-mode shell-maker)
+  :bind (:map global-map
+              ("C-c c" . copilot-chat-display))
+  :config
+  (add-hook 'copilot-chat-mode-hook #'copilot-chat-persistent-mode)
+  (setq copilot-chat-frontend 'shell-maker))
 
 (use-package! grip-mode
   :config
@@ -465,56 +510,48 @@ isn't there and triggers an error"
     :side 'bottom :size .5 :ttl nil :quit t :modeline nil)
   :bind ("C-c q" . chatgpt-query))
 
-(use-package org-roam
-  :ensure t
-  :init
-  (setq org-roam-v2-ack t)
-  :custom
-  (org-roam-directory "~/RoamNotes")
-  (org-roam-completion-everywhere t)
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n r" . org-roam-refile)
-         ("C-c n a" . org-roam-alias-add)
-         :map org-mode-map
-         ("C-M-i" . completion-at-point)
-         :map org-roam-dailies-map
-         ("Y" . org-roam-dailies-capture-yesterday)
-         ("T" . org-roam-dailies-capture-tomorrow))
-  :bind-keymap
-  ("C-c n d" . org-roam-dailies-map)
-  :config
-  (require 'org-roam-dailies) ;; Ensure the keymap is available
-  (org-roam-db-autosync-mode)
-  (setq org-roam-preview-function
-        (defun my/org-roam-preview-function ()
-          (let* ((elem (org-element-context))
-           (parent (org-element-property :parent elem)))
-      ;; TODO: alt handling for non-paragraph elements
-      (string-trim-right (buffer-substring-no-properties
-                          (org-element-property :begin parent)
-                          (org-element-property :end parent)))))))
+(use-package! default-text-scale
+  :bind (("C-x C-M--" . default-text-scale-decrease)
+         ("C-x C-M-+" . default-text-scale-increase)))
 
-(use-package! websocket
-    :after org-roam)
-
-(use-package! org-roam
+(use-package! markdown-preview-mode
   :config
-  (add-to-list 'display-buffer-alist
-               '("^\\*org-roam"
-                 (display-buffer-in-atom-window)
-                 (actions)
-                 (side . bottom)
-                 ;; (size . 0.8)
-                 ;; (window-width . 40)
-                 ;; (window-height . 0.16)
-                 ;; (slot . 20)
-                 ;; (vslot)
-                 ;; (window-parameters
-                 ;;  (ttl . 0)
-                 ;;  (quit)
-                 ;;  (select . t)
-                 ;;  (modeline)
-                 ;;  (autosave))
-                 )))
+ (setq markdown-preview-stylesheets
+      (list "https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/2.9.0/github-markdown.min.css"
+            "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" "
+  <style>
+   .markdown-body {
+     box-sizing: border-box;
+     min-width: 200px;
+     max-width: 980px;
+     margin: 0 auto;
+     padding: 45px;
+   }
+
+   @media (max-width: 767px) {
+     .markdown-body {
+       padding: 15px;
+     }
+   }
+  </style>
+"))
+(setq markdown-preview-javascript
+      (list "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" "
+  <script>
+   $(document).on('mdContentChange', function() {
+     $('pre code').each(function(i, block) {
+       hljs.highlightBlock(block);
+     });
+   });
+  </script>
+"))
+(setq markdown-preview-delay-time 3600))
+
+
+(use-package! good-scroll
+  :config
+  (good-scroll-mode 1))
+
+(use-package! ibuffer-sidebar
+  :bind
+  ("C-c i" . ibuffer-sidebar-toggle-sidebar))

@@ -43,6 +43,10 @@
 (package! separedit)
 (package! ob-http)
 (package! copilot)
+(package! copilot-chat
+  :recipe (:host github :repo "chep/copilot-chat.el" :files ("*.el")))
+;; (package! centaur-tabs)
+
 
 ;; (package! centered-cursor
 ;;   :recipe (:host github :repo "mpontus/centered-cursor.el"))
@@ -68,3 +72,9 @@
            :local-repo "simple-httpd"))
 (package! org-roam-ui)
 (package! treemacs)
+(package! copilot
+  :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
+
+(package! default-text-scale)
+(package! good-scroll)
+(package! ibuffer-sidebar)

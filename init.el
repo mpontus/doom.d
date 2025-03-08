@@ -14,6 +14,8 @@
 ;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
 ;;      directory (for easy access to its source code).
 
+(setq-default evil-respect-visual-line-mode t)
+
 (doom! :input
        ;;chinese
        ;;japanese
@@ -39,11 +41,11 @@
        ;;minimap           ; show a map of the code on the side
        modeline          ; snazzy, Atom-inspired modeline, plus API
        ;;nav-flash         ; blink cursor line after big motions
-       ;;neotree           ; a project drawer, like NERDTree for vim
+       neotree           ; a project drawer, like NERDTree for vim
        ophints           ; highlight the region an operation acts on
        (popup +defaults)   ; tame sudden yet inevitable temporary windows
-       ;;tabs              ; a tab bar for Emacs
-       ;; (treemacs +lsp)     ; a project drawer, like neotree but cooler
+       tabs              ; a tab bar for Emacs
+       (treemacs +lsp)     ; a project drawer, like neotree but cooler
       ;;unicode           ; extended unicode support for various languages
        vc-gutter         ; vcs diff in the fringe
        vi-tilde-fringe   ; fringe tildes to mark beyond EOB
