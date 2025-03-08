@@ -430,6 +430,14 @@ isn't there and triggers an error"
 
 (use-package org-persist)
 
+(use-package! copilot
+  :config (global-copilot-mode)
+  :bind (:map copilot-completion-map
+         ("RET" . #'copilot-accept-completion)
+         ("<tab>" . #'copilot-accept-completion-by-line)
+         ("C-<tab>" . #'copilot-accept-completion-by-word)
+         ("C-n" . #'copilot-next-completion)
+         ("C-p" . #'copilot-previous-completion)))
 
 (use-package! grip-mode
   :config

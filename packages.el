@@ -42,6 +42,7 @@
 (package! docker-tramp)
 (package! separedit)
 (package! ob-http)
+(package! copilot)
 
 ;; (package! centered-cursor
 ;;   :recipe (:host github :repo "mpontus/centered-cursor.el"))
