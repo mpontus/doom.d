@@ -78,3 +78,4 @@
 (package! default-text-scale)
 (package! good-scroll)
 (package! ibuffer-sidebar)
+(package! eldoc-box)
