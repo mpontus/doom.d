@@ -79,3 +79,5 @@
 (package! good-scroll)
 (package! ibuffer-sidebar)
 (package! eldoc-box)
+(package! structured-log-mode
+  :recipe (:host github :repo "lgfang/structured-log-mode"))
