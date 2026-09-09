@@ -76,7 +76,6 @@
   :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
 
 (package! default-text-scale)
-(package! good-scroll)
 (package! ibuffer-sidebar)
 (package! eldoc-box)
 (package! structured-log-mode

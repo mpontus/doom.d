@@ -548,10 +548,6 @@ isn't there and triggers an error"
 (setq markdown-preview-delay-time 3600))
 
 
-(use-package! good-scroll
-  :config
-  (good-scroll-mode 1))
-
 (use-package! ibuffer-sidebar
   :bind
   ("C-c i" . ibuffer-sidebar-toggle-sidebar))
