@@ -65,6 +65,11 @@
   :config
   (add-hook! 'nix-mode-hook #'nix-format-mode))
 
+(use-package! arei
+  :init
+  (setq geiser-mode-auto-p nil)
+  (global-arei-mode))
+
 (defadvice! nix-format-buffer--capture-error (f &rest rs)
   "Display actual error when nixfmt fails."
   :around 'nix-format-buffer
