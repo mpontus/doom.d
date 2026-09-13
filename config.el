@@ -142,6 +142,9 @@
 
 ;; Magit
 
+(after! magit
+  (setq magit-display-buffer-function #'magit-display-buffer-traditional))
+
 ;; (defun +magit-status-without-sudo (f &optional directory cache)
 ;;    (interactive)
 ;;    (or (and (tramp-tramp-file-p directory)
