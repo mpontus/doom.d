@@ -426,6 +426,7 @@ isn't there and triggers an error"
   (add-to-list 'separedit-block-regexp-plists
                '(:header "@example" :body "  " :footer ".*\\'" :keep-footer t)))
 (use-package! typescript-mode
+  :mode ("\\.tsx\\'" . typescript-mode)
   :config
   (define-key typescript-mode-map (kbd "C-c '") #'separedit))
 
