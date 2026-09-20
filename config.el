@@ -69,7 +69,8 @@
   :init
   (setq geiser-mode-auto-p nil)
   (global-arei-mode)
-  (set-popup-rule! "^\\*arei: " :size 0.3 :quit nil :ttl nil))
+  (set-popup-rule! "^\\*arei: " :size 0.3 :quit nil :ttl nil)
+  (set-popup-rule! "^\\*arei-debugger: " :size 0.3 :quit nil :ttl nil))
 
 (defadvice! nix-format-buffer--capture-error (f &rest rs)
   "Display actual error when nixfmt fails."
