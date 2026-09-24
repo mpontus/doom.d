@@ -82,3 +82,4 @@
   :recipe (:host github :repo "lgfang/structured-log-mode"))
 (package! arei
   :recipe (:host github :repo "abcdw/emacs-arei" :files ("lisp/*.el")))
+(package! magit-delta)
