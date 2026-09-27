@@ -148,7 +148,9 @@
   (setq magit-display-buffer-function #'magit-display-buffer-traditional))
 
 (use-package! magit-delta
-  :hook (magit-mode . magit-delta-mode))
+  :hook (magit-mode . (lambda ()
+                        (when (executable-find "delta")
+                          (magit-delta-mode +1)))))
 
 ;; (defun +magit-status-without-sudo (f &optional directory cache)
 ;;    (interactive)
