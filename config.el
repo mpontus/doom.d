@@ -145,7 +145,8 @@
 ;; Magit
 
 (after! magit
-  (setq magit-display-buffer-function #'magit-display-buffer-traditional))
+  (setq magit-display-buffer-function #'magit-display-buffer-traditional
+        magit-log-margin '(nil age magit-log-margin-width t 18)))
 
 (use-package! magit-delta
   :hook (magit-mode . (lambda ()
