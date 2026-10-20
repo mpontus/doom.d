@@ -181,7 +181,15 @@
 
 (use-package consult
   :config
-  (map! :leader "," #'consult-buffer
+  ;; Git-tracked files by default; C-u restores Doom's all-files search.
+  (defun +default/search-project-tracked (&optional arg)
+    "Search Git-tracked project files, or all files with a prefix argument."
+    (interactive "P")
+    (if arg
+        (+default/search-project arg)
+      (consult-git-grep)))
+  (map! :leader "/" #'+default/search-project-tracked
+        :leader "," #'consult-buffer
         :leader "." #'consult-locate))
 
 (use-package hydra
